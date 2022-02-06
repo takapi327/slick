@@ -1,11 +1,11 @@
 name: CI
 
 on:
- pull_request:
-   branches: ['**']
- push:
-   branches: ['**']
-   tags: [v*]
+  pull_request:
+    branches: ['**']
+  push:
+    branches: ['**']
+    tags: [v*]
 
 jobs:
   build:
@@ -54,6 +54,9 @@ jobs:
         options: >-
           --privileged
 
+    env:
+      TZ: Asia/Kamchatka
+
     steps:
     - uses: actions/checkout@v2
       with:
@@ -73,15 +76,18 @@ jobs:
         distribution: adopt
         java-version: ${{ matrix.java }}
 
-    - name: Build and test
-      run: |
-        sbt \
-          -Dslick.testkit-config=test-dbs/testkit.github-actions.conf \
-          ++${{ matrix.scala }} \
-          coverage testAll coverageReport \
-          testAllSamples
-      env:
-        TZ: Asia/Kamchatka
+    - run: sbt ++${{ matrix.scala }} compile
+    - run: sbt ++${{ matrix.scala }} Test/compile
+    - run: sbt ++${{ matrix.scala }} versionPolicyCheck
+    - run: sbt ++${{ matrix.scala }} coverage "reactive-streams-tests / Test / test"
+    - run: sbt ++${{ matrix.scala }} coverage testAllSamples
+    - run: |
+        sbt -Dslick.testkit-config=test-dbs/testkit.github-actions.conf ++${{ matrix.scala }} \
+          coverage "testkit / DocTest / test"
+    - run: |
+        sbt -Dslick.testkit-config=test-dbs/testkit.github-actions.conf ++${{ matrix.scala }} \
+          coverage "testkit / Test / test"
+    - run: sbt ++${{ matrix.scala }} coverageReport
 
   deploy_docs:
     name: Deploy Docs
