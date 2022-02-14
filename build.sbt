@@ -180,7 +180,22 @@ lazy val testkit =
           .get
       },
       DocTest / unmanagedSourceDirectories += docDir.value / "code",
-      DocTest / unmanagedResourceDirectories += docDir.value / "code"
+      DocTest / unmanagedResourceDirectories += docDir.value / "code",
+      TaskKey[Unit]("printTestGroups") := {
+        val groups =
+          (Test / definedTests).value
+            .groupBy { td =>
+              td.name.split('.').toSeq match {
+                case Seq("slick", "test", "profile", name) if name.startsWith("H2") => "H2"
+                case Seq("slick", "test", "profile", name)                          => name.take(4).toLowerCase
+                case _                                                              => ""
+              }
+            }
+            .map(_._2.map(_.name).sorted.mkString(" "))
+            .toSeq
+            .sorted
+        println("::set-output name=tests::[" + groups.map('"' + _ + '"').mkString(", ") + "]")
+      }
     )
 
 lazy val codegen =
