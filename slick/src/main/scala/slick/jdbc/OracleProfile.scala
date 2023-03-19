@@ -320,6 +320,7 @@ END;
     override val timeJdbcType: OracleTimeJdbcType = new OracleTimeJdbcType
     override val uuidJdbcType: OracleUUIDJdbcType = new OracleUUIDJdbcType
     override val localDateType: OracleLocalDateJdbcType = new OracleLocalDateJdbcType
+    override val localTimeType: OracleLocalTimeJdbcType = new OracleLocalTimeJdbcType
     override val localDateTimeType: OracleLocalDateTimeJdbcType = new OracleLocalDateTimeJdbcType
     override val instantType: OracleInstantJdbcType = new OracleInstantJdbcType
     override val offsetTimeType: OracleOffsetTimeJdbcType = new OracleOffsetTimeJdbcType
